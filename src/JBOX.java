@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,12 @@ import java.util.Map;
 public class JBOX {
     public static void main(String[] args) {
         SDCTD sdctd = new SDCTD();
+        HashMap b =sdctd.player.pool.ships;
+        List<Ship> a = new ArrayList<>();
+        a.lastIndexOf(b.values());
+        System.out.println(b);
+        System.out.println(a);
+
         MainFrame mainFrame = new MainFrame(sdctd.player);
     }
 }
@@ -81,7 +88,7 @@ class MainFrame {
                     tag_nums.add(List.of(player.pool.tag_nums).indexOf(b.getKey()));
 
                 }
-                for (int i = 0; i < tag_abc.size() - 2; i++) {
+                for (int i = 0; i < tag_abc.size(); i++) {
                     System.out.println("___visual_ships:" + tag_abc.get(i) + "    " + tag_nums.get(i));
                     buttons[tag_abc.get(i)][tag_nums.get(i)].setBackground(Color.BLUE);
 

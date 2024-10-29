@@ -48,10 +48,10 @@ class Ship {
 
     public boolean check_live() {
         if (live > 0) {
-            System.out.println("Got it!");
+            // System.out.println("Got it!");
             return true;
         } else {
-            System.out.println("Sank!");
+            // System.out.println("Sank!");
             return false;
         }
     }
@@ -60,6 +60,9 @@ class Ship {
         for (Map.Entry<String, String> E_cell : c_l.entrySet()){
             HashMap<String, Ship> p_cell = new HashMap<>();
             p_cell.put(E_cell.getValue(), this);
+            System.out.println("___Ship: create_ship: E_cell.getKey(): " + E_cell.getKey());
+            System.out.println("___Ship: create_ship: E_cell.getValue(): " + E_cell.getValue());
+            System.out.println("___Ship: create_ship: p_cell: " + p_cell);
             pool.ships.put(E_cell.getKey(), p_cell);
         }
         this.live = c_l.size();
@@ -69,7 +72,7 @@ class Ship {
 
 class Pool {
     String[] tag_nums = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};//vertical y
-    String[] tag_abc = {"a", "b", "c", "d", "e", "f", "j", "h", "i", "j"};//horizon x
+    String[] tag_abc = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};//horizon x
     HashMap<String, HashMap<String, HashMap<String, Boolean>>> pool = new HashMap<>();
     HashMap<String, HashMap<String, Ship>> ships = new HashMap<>();
 
@@ -84,7 +87,7 @@ class Pool {
             nestedMap.put("shoot", new HashMap<>(map_string));
             pool.put(tag, nestedMap);
         }
-        System.out.println("Pool is created");
+        // System.out.println("Pool is created");
 
         prepare_ships();
     }
@@ -97,7 +100,10 @@ class Pool {
         dict_ships.put(4, 1);
 
         for (Map.Entry<Integer, Integer> t_ship : dict_ships.entrySet()) {
+            System.out.println("___prepare_ship: t_ship:" + t_ship);
             for (int s_ship = 0; s_ship < t_ship.getKey(); s_ship++) {
+                System.out.println("___prepare_ship: s_ship:" + s_ship);
+                System.out.println("___prepare_ship: t_ship.key:" + t_ship.getKey());
                 create_ship(t_ship.getValue());
             }
         }
@@ -114,7 +120,7 @@ class Pool {
             cells = check_cell_v(ship_size);
             Ship a = new Ship(cells, this);
         }
-        System.out.println("___create_ship: " + cells);
+         System.out.println("___create_ship: " + cells);
         block_cells(cells);
     }
 
@@ -158,7 +164,7 @@ class Pool {
         List<String> tag_n = new ArrayList<>();
 
         for (Map.Entry<String, String> c : cells.entrySet()) {
-            System.out.println("___block_cells: " + c.getKey() + c.getValue());
+            // System.out.println("___block_cells: " + c.getKey() + c.getValue());
             if (!tag_a.contains(c.getKey())){
                 tag_a.add(c.getKey());
             }
@@ -170,44 +176,44 @@ class Pool {
         List<String> ch_dist_n = ch_dist(tag_n, tag_nums);
         for (String tag : ch_dist_a){
             for(String num : ch_dist_n){
-                System.out.println(num);
+//                // System.out.println(num);
                 this.pool.get(tag).get("locations").put(num, true);
             }
-            System.out.println(this.pool.get(tag).get("locations"));
+//            // System.out.println(this.pool.get(tag).get("locations"));
         }
 
     }
 
-    public List<String> ch_dist(List<String> list, String[] tags){
+    public List<String> ch_dist(List<String> list, String[] tags) {
         List<String> rd = new ArrayList<>();
-        System.out.println("___ch_dist List: " + list);
+//        // System.out.println("___ch_dist List: " + list);
         int n = List.of(tags).indexOf(list.get(0));
-        int nl = List.of(tags).indexOf(list.get(list.size()-1));
-        System.out.println("___ch_dist n: " + n);
+        int nl = List.of(tags).indexOf(list.get(list.size() - 1));
+//        // System.out.println("___ch_dist n: " + n);
         if (list.size() == 1) {
-            if (n > 1 && n < (tags.length)-1){
-                rd.add(tags[n-1]);
-                rd.add(tags[n]);
-                rd.add(tags[n+1]);
-            } else if(n > 1) {
+            if (n > 1 && n < (tags.length) - 1) {
                 rd.add(tags[n - 1]);
                 rd.add(tags[n]);
-            } else if(n < (tags.length)-1){
+                rd.add(tags[n + 1]);
+            } else if (n > 1) {
+                rd.add(tags[n - 1]);
                 rd.add(tags[n]);
-                rd.add(tags[n+1]);
+            } else if (n < (tags.length) - 1) {
+                rd.add(tags[n]);
+                rd.add(tags[n + 1]);
             }
-        } else if (n > 1 && n < (tags.length)-1){
+        } else if (n > 1 && n < (tags.length) - 1) {
             rd.add(tags[n - 1]);
             rd.addAll(list);
-            rd.add(tags[nl+1]);
-            } else if(n > 1){
+            rd.add(tags[nl + 1]);
+        } else if (n > 1) {
             rd.add(tags[n - 1]);
             rd.addAll(list);
-        } else if (n < (tags.length)-1){
+        } else if (n < (tags.length) - 1) {
             rd.addAll(list);
-            rd.add(tags[nl+1]);
+            rd.add(tags[nl + 1]);
         }
-        System.out.println("___ch_dist: "+rd);
+//        // System.out.println("___ch_dist: "+rd);
         return rd;
     }
 }

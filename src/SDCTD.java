@@ -7,9 +7,6 @@ public class SDCTD {
     public SDCTD() {
         System.out.println("___SDCTD: starting backends...");
         this.player = new Player();
-        this.bot = create_bot();
-
-        System.out.println(player.pool.ships);
     }
 
     public static Player create_bot() {

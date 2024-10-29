@@ -52,9 +52,10 @@ class MainFrame {
                     buttons[i][j].setPreferredSize(new Dimension(40, 40));
                     poolPanel.add(buttons[i][j]);
 
-                    visual_ships(player);
+
                 }
             }
+            visual_ships(player);
 
             poolPanel.setPreferredSize(new Dimension(400, 400));
 
@@ -80,10 +81,11 @@ class MainFrame {
                     tag_nums.add(List.of(player.pool.tag_nums).indexOf(b.getKey()));
 
                 }
+                for (int i = 0; i < tag_abc.size() - 2; i++) {
+                    System.out.println("___visual_ships:" + tag_abc.get(i) + "    " + tag_nums.get(i));
+                    buttons[tag_abc.get(i)][tag_nums.get(i)].setBackground(Color.BLUE);
 
-            for (int i = 0; i < tag_abc.size() - 2; i++) {
-                buttons[tag_abc.get(i)][tag_nums.get(i)].setBackground(Color.BLUE);
-            }
+                }
             }
         }
     }

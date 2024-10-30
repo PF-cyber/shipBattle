@@ -9,13 +9,9 @@ import java.util.Map;
 public class JBOX {
     public static void main(String[] args) {
         SDCTD sdctd = new SDCTD();
-        HashMap b =sdctd.player.pool.ships;
-        List<Ship> a = new ArrayList<>();
-        a.lastIndexOf(b.values());
-        System.out.println(b);
-        System.out.println(a);
-
         MainFrame mainFrame = new MainFrame(sdctd.player);
+        System.out.println("___Ship: create_ship: pool.ships: " + sdctd.player.pool.ships.entrySet());
+        System.out.println("___Ship: create_ship: pool.ships: " + sdctd.player.pool.pool.entrySet());
     }
 }
 
@@ -71,27 +67,22 @@ class MainFrame {
 
         public void visual_ships(Player player) {
             System.out.println("___visual_ships: started");
-            System.out.println("___visual_ships: started" + player.pool.ships.entrySet());
+                System.out.println("___visual_ships: started" + player.pool.ships.entrySet());
             List<Integer> tag_abc = new ArrayList<>();
             List<Integer> tag_nums = new ArrayList<>();
 
             System.out.println(player.pool.ships.entrySet());
             for (Map.Entry<String, HashMap<String, Ship>> a : player.pool.ships.entrySet()) {
                 tag_abc.add(List.of(player.pool.tag_abc).indexOf(a.getKey()));
-                System.out.println("___ABCletters:");
-                System.out.println(a.getKey());
-                System.out.println(tag_abc);
+                System.out.println("___ABCletters: " + a.getKey());
                 for (Map.Entry<String, Ship> b : a.getValue().entrySet()) {
-                    System.out.println("___NUMSletters:");
-                    System.out.println(b.getKey());
-                    System.out.println(tag_nums);
+                    System.out.println("___NUMSletters: " + b.getKey());
                     tag_nums.add(List.of(player.pool.tag_nums).indexOf(b.getKey()));
-
                 }
+
                 for (int i = 0; i < tag_abc.size(); i++) {
                     System.out.println("___visual_ships:" + tag_abc.get(i) + "    " + tag_nums.get(i));
                     buttons[tag_abc.get(i)][tag_nums.get(i)].setBackground(Color.BLUE);
-
                 }
             }
         }

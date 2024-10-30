@@ -37,7 +37,7 @@ class MainFrame {
         mainFrame.setVisible(true);
     }
 
-    class PoolFrame extends JPanel {
+    static class PoolFrame extends JPanel {
         JPanel poolPanel = new JPanel();
         private JButton[][] buttons;
         boolean EnButtons = true;
@@ -67,22 +67,19 @@ class MainFrame {
 
         public void visual_ships(Player player) {
             System.out.println("___visual_ships: started");
-                System.out.println("___visual_ships: started" + player.pool.ships.entrySet());
-            List<Integer> tag_abc = new ArrayList<>();
-            List<Integer> tag_nums = new ArrayList<>();
+            System.out.println("___visual_ships: started" + player.pool.ships.entrySet());
+            List<String> tag_abc = new ArrayList<>();
+            tag_abc = List.of(player.pool.tag_abc);
+            List<String> tag_nums = new ArrayList<>();
+            tag_nums = List.of(player.pool.tag_nums);
 
-            System.out.println(player.pool.ships.entrySet());
             for (Map.Entry<String, HashMap<String, Ship>> a : player.pool.ships.entrySet()) {
-                tag_abc.add(List.of(player.pool.tag_abc).indexOf(a.getKey()));
-                System.out.println("___ABCletters: " + a.getKey());
+                int n = tag_abc.indexOf(a.getKey());
+                System.out.println(a.getKey() + n);
                 for (Map.Entry<String, Ship> b : a.getValue().entrySet()) {
-                    System.out.println("___NUMSletters: " + b.getKey());
-                    tag_nums.add(List.of(player.pool.tag_nums).indexOf(b.getKey()));
-                }
-
-                for (int i = 0; i < tag_abc.size(); i++) {
-                    System.out.println("___visual_ships:" + tag_abc.get(i) + "    " + tag_nums.get(i));
-                    buttons[tag_abc.get(i)][tag_nums.get(i)].setBackground(Color.BLUE);
+                    int j = tag_nums.indexOf(b.getKey());
+                    System.out.println(b.getKey() + j);
+                    buttons[n][j].setBackground(Color.BLUE);
                 }
             }
         }

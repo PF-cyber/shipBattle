@@ -56,14 +56,20 @@ class Ship {
         }
     }
 
-    public void create_ship(HashMap<String ,String> c_l, Pool pool){
-        for (Map.Entry<String, String> E_cell : c_l.entrySet()){
-            HashMap<String, Ship> p_cell = new HashMap<>();
+    public void create_ship(HashMap<String, String> c_l, Pool pool) {
+        for (Map.Entry<String, String> E_cell : c_l.entrySet()) {
+            // Получаем существующий HashMap или создаем новый, если его нет
+            HashMap<String, Ship> p_cell = pool.ships.getOrDefault(E_cell.getKey(), new HashMap<>());
+
+            // Добавляем текущий корабль в p_cell
             p_cell.put(E_cell.getValue(), this);
+
+            // Сохраняем обновленный p_cell обратно в pool.ships
+            pool.ships.put(E_cell.getKey(), p_cell);
+
             System.out.println("___Ship: create_ship: E_cell.getKey(): " + E_cell.getKey());
             System.out.println("___Ship: create_ship: E_cell.getValue(): " + E_cell.getValue());
             System.out.println("___Ship: create_ship: p_cell: " + p_cell);
-            pool.ships.put(E_cell.getKey(), p_cell);
         }
         this.live = c_l.size();
     }

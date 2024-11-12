@@ -1,5 +1,5 @@
-import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 import java.util.*;
+
 
 public class SDCTD {
     Player player;
@@ -27,14 +27,17 @@ class Player {
     }
 
     public void shoot(String x, String y, Player player) {
-        if (x == null && y == null) {
+        if ((x == null) || (y == null)) {
             Scanner sc = new Scanner(System.in);
             x = sc.next();
             y = sc.next();
-            if ((x == null) || (y == null)) {
-
-            }
             sc.close();
+        }
+        if (!player.pool.pool.get(x).get("locations").get(y)){
+            if ((player.pool.ships.get(x).get(y) != null)){
+                player.pool.ships.get(x).get(y).getDamage(x,y, player);
+            }
+
         }
     }
 }
@@ -46,25 +49,11 @@ class Ship {
         create_ship(c_l, pool);
     }
 
-    public boolean check_live() {
-        if (live > 0) {
-            // System.out.println("Got it!");
-            return true;
-        } else {
-            // System.out.println("Sank!");
-            return false;
-        }
-    }
-
     public void create_ship(HashMap<String, String> c_l, Pool pool) {
         for (Map.Entry<String, String> E_cell : c_l.entrySet()) {
-            // Получаем существующий HashMap или создаем новый, если его нет
             HashMap<String, Ship> p_cell = pool.ships.getOrDefault(E_cell.getKey(), new HashMap<>());
 
-            // Добавляем текущий корабль в p_cell
             p_cell.put(E_cell.getValue(), this);
-
-            // Сохраняем обновленный p_cell обратно в pool.ships
             pool.ships.put(E_cell.getKey(), p_cell);
 
             System.out.println("___Ship: create_ship: E_cell.getKey(): " + E_cell.getKey());
@@ -72,6 +61,19 @@ class Ship {
             System.out.println("___Ship: create_ship: p_cell: " + p_cell);
         }
         this.live = c_l.size();
+    }
+
+    public void getDamage(String x, String y, Player player){
+        this.live -= 1;
+
+        player.pool.ships.remove(x);
+        player.pool.pool.get(x).get("locations").put(y, true);
+
+        if (this.live == 0){
+            System.out.println("Sunk!");
+        } else {
+            System.out.println("Got it!");
+        }
     }
 }
 
@@ -93,8 +95,7 @@ class Pool {
             nestedMap.put("shoot", new HashMap<>(map_string));
             pool.put(tag, nestedMap);
         }
-        // System.out.println("Pool is created");
-
+        System.out.println("Pool is created");
         prepare_ships();
     }
 
@@ -133,6 +134,8 @@ class Pool {
     public HashMap<String, String> check_cell_h(int ship_size){
         for (Map.Entry<String, HashMap<String, HashMap<String, Boolean>>> tag : pool.entrySet()){
             HashMap<String, String> s_ship = new HashMap<>();
+            int n = (int) (Math.random()*9);
+            int i = 0;
 
             for(Map.Entry<String, Boolean> tag_n : tag.getValue().get("locations").entrySet()){
                 if (!tag_n.getValue()){
@@ -170,7 +173,6 @@ class Pool {
         List<String> tag_n = new ArrayList<>();
 
         for (Map.Entry<String, String> c : cells.entrySet()) {
-            // System.out.println("___block_cells: " + c.getKey() + c.getValue());
             if (!tag_a.contains(c.getKey())){
                 tag_a.add(c.getKey());
             }
@@ -182,20 +184,16 @@ class Pool {
         List<String> ch_dist_n = ch_dist(tag_n, tag_nums);
         for (String tag : ch_dist_a){
             for(String num : ch_dist_n){
-//                // System.out.println(num);
                 this.pool.get(tag).get("locations").put(num, true);
             }
-//            // System.out.println(this.pool.get(tag).get("locations"));
         }
-
     }
 
     public List<String> ch_dist(List<String> list, String[] tags) {
         List<String> rd = new ArrayList<>();
-//        // System.out.println("___ch_dist List: " + list);
-        int n = List.of(tags).indexOf(list.get(0));
-        int nl = List.of(tags).indexOf(list.get(list.size() - 1));
-//        // System.out.println("___ch_dist n: " + n);
+        int n = List.of(tags).indexOf(list.getFirst());
+        int nl = List.of(tags).indexOf(list.getLast());
+
         if (list.size() == 1) {
             if (n > 1 && n < (tags.length) - 1) {
                 rd.add(tags[n - 1]);
@@ -219,7 +217,6 @@ class Pool {
             rd.addAll(list);
             rd.add(tags[nl + 1]);
         }
-//        // System.out.println("___ch_dist: "+rd);
         return rd;
     }
 }

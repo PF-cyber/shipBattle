@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,14 +18,12 @@ class MainFrame {
     JFrame mainFrame = new JFrame();
 
     MainFrame(Player player) {
-
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setResizable(false);
 
         PoolFrame pp = new PoolFrame(player);
         pp.EnButtons = false;
         PoolFrame pe = new PoolFrame(player);
-
 
         mainFrame.setLayout(new BorderLayout());
         mainFrame.add(new PoolFrame(player), BorderLayout.WEST);
@@ -37,16 +34,15 @@ class MainFrame {
         mainFrame.setVisible(true);
     }
 
+
     static class PoolFrame extends JPanel {
         JPanel poolPanel = new JPanel();
-        private JButton[][] buttons;
+        private final JButton[][] buttons = new JButton[10][10];
         boolean EnButtons = true;
 
         PoolFrame(Player player) {
             poolPanel.setLayout(new GridLayout(10, 10));
             poolPanel.setBackground(Color.GRAY);
-
-            buttons = new JButton[10][10];
 
             for (int i = 0; i < 10; i++) {
                 for (int j = 0; j < 10; j++) {
@@ -54,31 +50,23 @@ class MainFrame {
                     buttons[i][j].setEnabled(this.EnButtons);
                     buttons[i][j].setPreferredSize(new Dimension(40, 40));
                     poolPanel.add(buttons[i][j]);
-
-
                 }
             }
             visual_ships(player);
-
             poolPanel.setPreferredSize(new Dimension(400, 400));
-
             this.add(poolPanel);
         }
 
         public void visual_ships(Player player) {
             System.out.println("___visual_ships: started");
             System.out.println("___visual_ships: started" + player.pool.ships.entrySet());
-            List<String> tag_abc = new ArrayList<>();
-            tag_abc = List.of(player.pool.tag_abc);
-            List<String> tag_nums = new ArrayList<>();
-            tag_nums = List.of(player.pool.tag_nums);
+            List<String> tag_abc= List.of(player.pool.tag_abc);
+            List<String> tag_nums = List.of(player.pool.tag_nums);
 
             for (Map.Entry<String, HashMap<String, Ship>> a : player.pool.ships.entrySet()) {
                 int n = tag_abc.indexOf(a.getKey());
-                System.out.println(a.getKey() + n);
                 for (Map.Entry<String, Ship> b : a.getValue().entrySet()) {
                     int j = tag_nums.indexOf(b.getKey());
-                    System.out.println(b.getKey() + j);
                     buttons[n][j].setBackground(Color.BLUE);
                 }
             }

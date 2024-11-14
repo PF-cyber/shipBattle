@@ -4,6 +4,7 @@ import java.util.*;
 public class SDCTD {
     Player player;
     Player bot;
+
     public SDCTD() {
         System.out.println("___SDCTD: starting backends...");
         this.player = new Player();
@@ -33,9 +34,9 @@ class Player {
             y = sc.next();
             sc.close();
         }
-        if (!player.pool.pool.get(x).get("locations").get(y)){
-            if ((player.pool.ships.get(x).get(y) != null)){
-                player.pool.ships.get(x).get(y).getDamage(x,y, player);
+        if (!player.pool.pool.get(x).get("locations").get(y)) {
+            if ((player.pool.ships.get(x).get(y) != null)) {
+                player.pool.ships.get(x).get(y).getDamage(x, y, player);
             }
 
         }
@@ -45,31 +46,33 @@ class Player {
 class Ship {
     Integer live;
 
-    public Ship(HashMap<String,String> c_l, Pool pool) {
+    public Ship(HashMap<String, List<String>> c_l, Pool pool) {
         create_ship(c_l, pool);
     }
 
-    public void create_ship(HashMap<String, String> c_l, Pool pool) {
-        for (Map.Entry<String, String> E_cell : c_l.entrySet()) {
+    public void create_ship(HashMap<String, List<String>> c_l, Pool pool) {
+        for (Map.Entry<String, List<String>> E_cell : c_l.entrySet()) {
             HashMap<String, Ship> p_cell = pool.ships.getOrDefault(E_cell.getKey(), new HashMap<>());
 
-            p_cell.put(E_cell.getValue(), this);
-            pool.ships.put(E_cell.getKey(), p_cell);
+            for (String C_cell : E_cell.getValue()) {
+                p_cell.put(C_cell, this);
+                pool.ships.put(E_cell.getKey(), p_cell);
 
-            System.out.println("___Ship: create_ship: E_cell.getKey(): " + E_cell.getKey());
-            System.out.println("___Ship: create_ship: E_cell.getValue(): " + E_cell.getValue());
-            System.out.println("___Ship: create_ship: p_cell: " + p_cell);
+                System.out.println("___Ship: create_ship: E_cell.getKey(): " + E_cell.getKey());
+                System.out.println("___Ship: create_ship: E_cell.getValue(): " + E_cell.getValue());
+                System.out.println("___Ship: create_ship: p_cell: " + p_cell);
+            }
         }
         this.live = c_l.size();
     }
 
-    public void getDamage(String x, String y, Player player){
+    public void getDamage(String x, String y, Player player) {
         this.live -= 1;
 
         player.pool.ships.remove(x);
         player.pool.pool.get(x).get("locations").put(y, true);
 
-        if (this.live == 0){
+        if (this.live == 0) {
             System.out.println("Sunk!");
         } else {
             System.out.println("Got it!");
@@ -116,74 +119,90 @@ class Pool {
         }
     }
 
-    public void create_ship(int ship_size){
+    public void create_ship(int ship_size) {
         Random random = new Random();
-        HashMap<String,String> cells;
+        HashMap<String, List<String>> cells;
         boolean isHorizontal = random.nextBoolean();
-        if (isHorizontal){
+        if (isHorizontal) {
             cells = check_cell_h(ship_size);
             Ship a = new Ship(cells, this);
         } else {
             cells = check_cell_v(ship_size);
             Ship a = new Ship(cells, this);
         }
-         System.out.println("___create_ship: " + cells);
+        System.out.println("___create_ship: " + cells);
         block_cells(cells);
     }
 
-    public HashMap<String, String> check_cell_h(int ship_size){
-        for (Map.Entry<String, HashMap<String, HashMap<String, Boolean>>> tag : pool.entrySet()){
-            HashMap<String, String> s_ship = new HashMap<>();
-            int n = (int) (Math.random()*9);
-            int i = 0;
+    public HashMap<String, List<String>> check_cell_v(int ship_size) {
+        for (String tag_n : tag_nums) {
+            HashMap<String, List<String>> s_ship = new HashMap<>();
+            List<String> cell = new ArrayList<>();
 
-            for(Map.Entry<String, Boolean> tag_n : tag.getValue().get("locations").entrySet()){
-                if (!tag_n.getValue()){
-                    s_ship.put(tag.getKey(), tag_n.getKey());
-                    if (s_ship.size() == ship_size){
-                        return s_ship;
+            for (int i = 0; i < 10 - ship_size; i++) {
+                for (int n = 0; n < ship_size; n++) {
+                    if (!pool.get(tag_abc[i + n]).get("locations").get(tag_n)) {
+                        s_ship.put(tag_abc[i + n], Collections.singletonList(tag_n));
+                        if (s_ship.size() == ship_size) {
+                            return s_ship;
+                        }
                     }
-                } else {
-                    s_ship = new HashMap<>();
                 }
+
             }
         }
-     return check_cell_v(ship_size);
-    }
-
-    public HashMap<String, String> check_cell_v(int ship_size){
-        for (String tag_n : tag_nums){
-            HashMap<String, String> s_ship = new HashMap<>();
-            for(Map.Entry<String, HashMap<String, HashMap<String, Boolean>>> tag : pool.entrySet()){
-                if (!tag.getValue().get("locations").get(tag_n)){
-                    s_ship.put(tag.getKey(), tag_n);
-                    if (s_ship.size() == ship_size){
-                        return s_ship;
-                    }
-                } else {
-                    s_ship = new HashMap<>();
-                }
-            }
-        }
+        System.out.println("Use another orient");
         return check_cell_h(ship_size);
     }
 
-    public void block_cells(HashMap<String, String> cells){
+    public HashMap<String, List<String>> check_cell_h(int ship_size) {
+        for (Map.Entry<String, HashMap<String, HashMap<String, Boolean>>> tag : pool.entrySet()) {
+            HashMap<String, List<String>> s_ship = new HashMap<>();
+            List<String> cell = new ArrayList<>();
+
+            for (int i = 0; i < 10 - ship_size; i++) {
+                System.out.println("___check_cell_v: i = " + i);
+                for (int n = 0; n < ship_size; n++) {
+                    System.out.println("___check_cell_v: n = " + n);
+                    System.out.println("___check_cell_v: " + tag.getValue().get("locations").get(tag_nums[i + n]));
+                    if (!tag.getValue().get("locations").get(tag_nums[i + n])) {
+                        System.out.println(tag.getKey() + tag_nums[i + n]);
+                        cell.add(tag_nums[i + n]);
+                        System.out.println("___check_cell_v: " + cell.size() + " to " + ship_size);
+                        if (cell.size() == ship_size) {
+                            s_ship.put(tag.getKey(), cell);
+                            System.out.println("___check_cell_v: return");
+                            return s_ship;
+                        }
+                    } else {
+                        s_ship = new HashMap<>();
+                        cell = new ArrayList<>();
+                    }
+                }
+            }
+        }
+        System.out.println("Use another orient");
+        return check_cell_v(ship_size);
+    }
+
+    public void block_cells(HashMap<String, List<String>> cells) {
         List<String> tag_a = new ArrayList<>();
         List<String> tag_n = new ArrayList<>();
 
-        for (Map.Entry<String, String> c : cells.entrySet()) {
-            if (!tag_a.contains(c.getKey())){
+        for (Map.Entry<String, List<String>> c : cells.entrySet()) {
+            if (!tag_a.contains(c.getKey())) {
                 tag_a.add(c.getKey());
             }
-            if (!tag_n.contains(c.getValue())){
-                tag_n.add(c.getValue());
+            for (String cc : c.getValue()) {
+                if (!tag_n.contains(cc)) {
+                    tag_n.add(cc);
+                }
             }
         }
         List<String> ch_dist_a = ch_dist(tag_a, tag_abc);
         List<String> ch_dist_n = ch_dist(tag_n, tag_nums);
-        for (String tag : ch_dist_a){
-            for(String num : ch_dist_n){
+        for (String tag : ch_dist_a) {
+            for (String num : ch_dist_n) {
                 this.pool.get(tag).get("locations").put(num, true);
             }
         }

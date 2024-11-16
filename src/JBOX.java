@@ -60,10 +60,8 @@ class MainFrame {
         public void visual_ships(Player player) {
             System.out.println("___visual_ships: started");
             System.out.println("___visual_ships: started" + player.pool.ships.entrySet());
-            List<String> tag_abc= List.of(player.pool.tag_abc);
-            List<String> tag_nums = List.of(player.pool.tag_nums);
 
-            for (Map.Entry<String, HashMap<String, Ship>> a : player.pool.ships.entrySet()) {
+            for (Map.Entry<Integer, List<Integer>> a : player.pool.ships.entrySet()) {
                 int n = tag_abc.indexOf(a.getKey());
                 for (Map.Entry<String, Ship> b : a.getValue().entrySet()) {
                     int j = tag_nums.indexOf(b.getKey());

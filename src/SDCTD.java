@@ -1,3 +1,5 @@
+import javax.swing.text.StyledEditorKit;
+import java.net.InterfaceAddress;
 import java.util.*;
 
 
@@ -27,34 +29,32 @@ class Player {
         pool = new Pool();
     }
 
-    public void shoot(String x, String y, Player player) {
+    public void shoot(Integer x, Integer y, Player player) {
         if ((x == null) || (y == null)) {
             Scanner sc = new Scanner(System.in);
-            x = sc.next();
-            y = sc.next();
+            x = Integer.parseInt(sc.next());
+            y = Integer.parseInt(sc.next());
             sc.close();
         }
-        if (!player.pool.pool.get(x).get("locations").get(y)) {
-            if ((player.pool.ships.get(x).get(y) != null)) {
-                player.pool.ships.get(x).get(y).getDamage(x, y, player);
-            }
-
+        if (player.pool.ships.get(x).get(y) != null && player.pool.pool.get(x).get(y)) {
+            player.pool.ships.get(x).get(y).getDamage(x, y, player);
         }
     }
 }
 
 class Ship {
     Integer live;
+    HashMap<Integer, List<Integer>> location = new HashMap<>();
 
-    public Ship(HashMap<String, List<String>> c_l, Pool pool) {
+    public Ship(HashMap<Integer, List<Integer>> c_l, Pool pool) {
         create_ship(c_l, pool);
     }
 
-    public void create_ship(HashMap<String, List<String>> c_l, Pool pool) {
-        for (Map.Entry<String, List<String>> E_cell : c_l.entrySet()) {
-            HashMap<String, Ship> p_cell = pool.ships.getOrDefault(E_cell.getKey(), new HashMap<>());
+    public void create_ship(HashMap<Integer, List<Integer>> c_l, Pool pool) {
+        for (Map.Entry<Integer, List<Integer>> E_cell : c_l.entrySet()) {
+            HashMap<Integer, Ship> p_cell = pool.ships.getOrDefault(E_cell.getKey(), new HashMap<>());
 
-            for (String C_cell : E_cell.getValue()) {
+            for (Integer C_cell : E_cell.getValue()) {
                 p_cell.put(C_cell, this);
                 pool.ships.put(E_cell.getKey(), p_cell);
 
@@ -66,11 +66,11 @@ class Ship {
         this.live = c_l.size();
     }
 
-    public void getDamage(String x, String y, Player player) {
+    public void getDamage(Integer x, Integer y, Player player) {
         this.live -= 1;
 
         player.pool.ships.remove(x);
-        player.pool.pool.get(x).get("locations").put(y, true);
+        player.pool.pool.get(x).put(y, true);
 
         if (this.live == 0) {
             System.out.println("Sunk!");
@@ -82,21 +82,16 @@ class Ship {
 
 
 class Pool {
-    String[] tag_nums = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};//vertical y
-    String[] tag_abc = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};//horizon x
-    HashMap<String, HashMap<String, HashMap<String, Boolean>>> pool = new HashMap<>();
-    HashMap<String, HashMap<String, Ship>> ships = new HashMap<>();
+    HashMap<Integer, HashMap<Integer, Boolean>> pool = new HashMap<>();
+    HashMap<Integer, HashMap<Integer, Ship>> ships = new HashMap<>();
 
     Pool() {
-        HashMap<String, Boolean> map_string = new HashMap<>();
-        for (String tag : tag_nums) {
-            map_string.put(tag, false);
-        }
-        for (String tag : tag_abc) {
-            HashMap<String, HashMap<String, Boolean>> nestedMap = new HashMap<>();
-            nestedMap.put("locations", new HashMap<>(map_string));
-            nestedMap.put("shoot", new HashMap<>(map_string));
-            pool.put(tag, nestedMap);
+        HashMap<Integer, Boolean> map_string = new HashMap<>();
+        for (int i = 0; i < 10; i++) {
+            for (int n = 0; n < 10; n++) {
+                map_string.put(n, true);
+            }
+            pool.put(i, map_string);
         }
         System.out.println("Pool is created");
         prepare_ships();
@@ -110,132 +105,90 @@ class Pool {
         dict_ships.put(4, 1);
 
         for (Map.Entry<Integer, Integer> t_ship : dict_ships.entrySet()) {
-            System.out.println("___prepare_ship: t_ship:" + t_ship);
             for (int s_ship = 0; s_ship < t_ship.getKey(); s_ship++) {
-                System.out.println("___prepare_ship: s_ship:" + s_ship);
-                System.out.println("___prepare_ship: t_ship.key:" + t_ship.getKey());
                 create_ship(t_ship.getValue());
             }
         }
     }
 
+
     public void create_ship(int ship_size) {
         Random random = new Random();
-        HashMap<String, List<String>> cells;
+        HashMap<Integer, List<Integer>> cells;
         boolean isHorizontal = random.nextBoolean();
         if (isHorizontal) {
-            cells = check_cell_h(ship_size);
+            cells = checkCellH(ship_size);
             Ship a = new Ship(cells, this);
         } else {
-            cells = check_cell_v(ship_size);
+            cells = checkCellV(ship_size);
             Ship a = new Ship(cells, this);
         }
         System.out.println("___create_ship: " + cells);
         block_cells(cells);
     }
 
-    public HashMap<String, List<String>> check_cell_v(int ship_size) {
-        for (String tag_n : tag_nums) {
-            HashMap<String, List<String>> s_ship = new HashMap<>();
-            List<String> cell = new ArrayList<>();
+    public HashMap<Integer, List<Integer>> checkCellV(int ship_size) {
+        for (int num = 0; num < 10; num++) {
+            HashMap<Integer, List<Integer>> ships_cells = new HashMap<>();
+            List<Integer> map_string = new ArrayList<>();
 
-            for (int i = 0; i < 10 - ship_size; i++) {
-                for (int n = 0; n < ship_size; n++) {
-                    if (!pool.get(tag_abc[i + n]).get("locations").get(tag_n)) {
-                        s_ship.put(tag_abc[i + n], Collections.singletonList(tag_n));
-                        if (s_ship.size() == ship_size) {
-                            return s_ship;
+            for (int abc = 0; abc < 10 - ship_size; abc++) {
+                for (int len = 0; len < ship_size; len++) {
+                    if (pool.get(abc + len).get(num)) {
+                        ships_cells.put(abc + len, Collections.singletonList(num));
+                        if (ships_cells.size() == ship_size) {
+                            return ships_cells;
                         }
                     }
                 }
-
             }
         }
-        System.out.println("Use another orient");
-        return check_cell_h(ship_size);
+        return checkCellH(ship_size);
     }
 
-    public HashMap<String, List<String>> check_cell_h(int ship_size) {
-        for (Map.Entry<String, HashMap<String, HashMap<String, Boolean>>> tag : pool.entrySet()) {
-            HashMap<String, List<String>> s_ship = new HashMap<>();
-            List<String> cell = new ArrayList<>();
+    public HashMap<Integer, List<Integer>> checkCellH(int ship_size) {
+        HashMap<Integer, List<Integer>> ships_cells = new HashMap<>();
+        List<Integer> map_string = new ArrayList<>();
 
-            for (int i = 0; i < 10 - ship_size; i++) {
-                System.out.println("___check_cell_v: i = " + i);
-                for (int n = 0; n < ship_size; n++) {
-                    System.out.println("___check_cell_v: n = " + n);
-                    System.out.println("___check_cell_v: " + tag.getValue().get("locations").get(tag_nums[i + n]));
-                    if (!tag.getValue().get("locations").get(tag_nums[i + n])) {
-                        System.out.println(tag.getKey() + tag_nums[i + n]);
-                        cell.add(tag_nums[i + n]);
-                        System.out.println("___check_cell_v: " + cell.size() + " to " + ship_size);
-                        if (cell.size() == ship_size) {
-                            s_ship.put(tag.getKey(), cell);
-                            System.out.println("___check_cell_v: return");
-                            return s_ship;
+        for (int abc = 0; abc < 10; abc++) {
+            for (int num = 0; num < 10 - ship_size; num++) {
+                for (int len = 0; len < ship_size; len++) {
+                    if (pool.get(abc).get(num + len)) {
+                        map_string.add(num + len);
+                        if (map_string.size() == ship_size) {
+                            ships_cells.put(abc, map_string);
+                            return ships_cells;
                         }
                     } else {
-                        s_ship = new HashMap<>();
-                        cell = new ArrayList<>();
+                        map_string = new ArrayList<>();
                     }
                 }
             }
         }
-        System.out.println("Use another orient");
-        return check_cell_v(ship_size);
+        return checkCellV(ship_size);
     }
 
-    public void block_cells(HashMap<String, List<String>> cells) {
-        List<String> tag_a = new ArrayList<>();
-        List<String> tag_n = new ArrayList<>();
+    public void block_cells(HashMap<Integer, List<Integer>> cells) {
+        List<Integer> listABC = new ArrayList<>();
+        List<Integer> listNUMS = new ArrayList<>();
 
-        for (Map.Entry<String, List<String>> c : cells.entrySet()) {
-            if (!tag_a.contains(c.getKey())) {
-                tag_a.add(c.getKey());
-            }
-            for (String cc : c.getValue()) {
-                if (!tag_n.contains(cc)) {
-                    tag_n.add(cc);
-                }
-            }
-        }
-        List<String> ch_dist_a = ch_dist(tag_a, tag_abc);
-        List<String> ch_dist_n = ch_dist(tag_n, tag_nums);
-        for (String tag : ch_dist_a) {
-            for (String num : ch_dist_n) {
-                this.pool.get(tag).get("locations").put(num, true);
-            }
+        for (Map.Entry<Integer, HashMap<Integer, Ship>> ship : this.ships.entrySet()) {
+            listABC.add(ship.getKey());
         }
     }
 
-    public List<String> ch_dist(List<String> list, String[] tags) {
-        List<String> rd = new ArrayList<>();
-        int n = List.of(tags).indexOf(list.getFirst());
-        int nl = List.of(tags).indexOf(list.getLast());
+    public List<Integer> bDist(List<Integer> list) {
+        List<Integer> radius = new ArrayList<>();
 
-        if (list.size() == 1) {
-            if (n > 1 && n < (tags.length) - 1) {
-                rd.add(tags[n - 1]);
-                rd.add(tags[n]);
-                rd.add(tags[n + 1]);
-            } else if (n > 1) {
-                rd.add(tags[n - 1]);
-                rd.add(tags[n]);
-            } else if (n < (tags.length) - 1) {
-                rd.add(tags[n]);
-                rd.add(tags[n + 1]);
+        for (int item : list) {
+            if (0 < item) {
+                radius.add(item - 1);
             }
-        } else if (n > 1 && n < (tags.length) - 1) {
-            rd.add(tags[n - 1]);
-            rd.addAll(list);
-            rd.add(tags[nl + 1]);
-        } else if (n > 1) {
-            rd.add(tags[n - 1]);
-            rd.addAll(list);
-        } else if (n < (tags.length) - 1) {
-            rd.addAll(list);
-            rd.add(tags[nl + 1]);
+            if (item < 10) {
+                radius.add(item + 1);
+            }
+            radius.add(item);
         }
-        return rd;
+        return radius;
     }
 }

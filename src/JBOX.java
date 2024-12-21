@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,9 +7,7 @@ import java.util.Map;
 public class JBOX {
     public static void main(String[] args) {
         SDCTD sdctd = new SDCTD();
-        MainFrame mainFrame = new MainFrame(sdctd.player);
-        System.out.println("___Ship: create_ship: pool.ships: " + sdctd.player.pool.ships.entrySet());
-        System.out.println("___Ship: create_ship: pool.ships: " + sdctd.player.pool.pool.entrySet());
+        MainFrame MFrame = new MainFrame(sdctd.player);
     }
 }
 
@@ -34,7 +31,6 @@ class MainFrame {
         mainFrame.setVisible(true);
     }
 
-
     static class PoolFrame extends JPanel {
         JPanel poolPanel = new JPanel();
         private final JButton[][] buttons = new JButton[10][10];
@@ -52,20 +48,36 @@ class MainFrame {
                     poolPanel.add(buttons[i][j]);
                 }
             }
-            visual_ships(player);
+            visualShipsPOOL(player);
             poolPanel.setPreferredSize(new Dimension(400, 400));
             this.add(poolPanel);
         }
 
-        public void visual_ships(Player player) {
-            System.out.println("___visual_ships: started");
-            System.out.println("___visual_ships: started" + player.pool.ships.entrySet());
+        public void visualShipsLOC(Player player) {
+            for (Ship ship : player.pool.ships) {
+                for (Map.Entry<Integer, List<Integer>> s_ship : ship.location.entrySet()) {
+                    int key = s_ship.getKey();
+                    for (Integer value : s_ship.getValue()) {
+                        buttons[key][value].setBackground(Color.BLUE);
+                    }
+                }
+            }
+        }
 
-            for (Map.Entry<Integer, List<Integer>> a : player.pool.ships.entrySet()) {
-                int n = tag_abc.indexOf(a.getKey());
-                for (Map.Entry<String, Ship> b : a.getValue().entrySet()) {
-                    int j = tag_nums.indexOf(b.getKey());
-                    buttons[n][j].setBackground(Color.BLUE);
+        public void visualShipsPOOL(Player player) {
+
+            for (Map.Entry<Integer, HashMap<Integer, Object>> ship : player.pool.pool.entrySet()) {
+                int key = ship.getKey();
+                for (Map.Entry<Integer, Object> s_ship : ship.getValue().entrySet()) {
+                    Integer vey = s_ship.getKey();
+                    Object value = s_ship.getValue();
+
+                    if (value instanceof Ship) {
+                        buttons[key][vey].setBackground(Color.BLUE);
+                    } else if (!((boolean) value)) {
+                        buttons[key][vey].setBackground(Color.GREEN);
+                    }
+
                 }
             }
         }

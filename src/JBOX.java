@@ -19,12 +19,13 @@ class MainFrame {
         mainFrame.setResizable(false);
 
         PoolFrame pp = new PoolFrame(player);
+        pp.visualShipsPOOL(player);
         pp.EnButtons = false;
         PoolFrame pe = new PoolFrame(player);
 
         mainFrame.setLayout(new BorderLayout());
-        mainFrame.add(new PoolFrame(player), BorderLayout.WEST);
-        mainFrame.add(new PoolFrame(player), BorderLayout.EAST);
+        mainFrame.add(pp, BorderLayout.WEST);
+        mainFrame.add(pe, BorderLayout.EAST);
 
         mainFrame.setTitle("BattleshipGame");
         mainFrame.setSize(1200, 700);
@@ -48,7 +49,6 @@ class MainFrame {
                     poolPanel.add(buttons[i][j]);
                 }
             }
-            visualShipsPOOL(player);
             poolPanel.setPreferredSize(new Dimension(400, 400));
             this.add(poolPanel);
         }

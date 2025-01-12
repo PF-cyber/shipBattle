@@ -6,12 +6,11 @@ import java.util.stream.Collectors;
 
 public class SDCTD {
     Player player;
-    Player bot;
+    Player enemy;
 
     public SDCTD() {
-        System.out.println("___SDCTD: starting backends...");
         this.player = new Player();
-        System.out.println(player.pool.pool);
+        this.enemy = create_bot();
     }
 
     public static Player create_bot() {
@@ -25,10 +24,13 @@ public class SDCTD {
 
 class Player {
     Pool pool;
+    Pool E_pool;
     String name = "Player1";
 
     Player() {
         pool = new Pool();
+        pool.preparePool();
+        E_pool = new Pool();
     }
 
     public void shoot(Integer x, Integer y, Player player) {
@@ -43,14 +45,15 @@ class Player {
 
 
 class Pool {
-    String className = new Object() {
-    }.getClass().getName();
-
     HashMap<Integer, HashMap<Integer, Object>> pool = new HashMap<>();
     List<Ship> ships = new ArrayList<>();
     LOG log = new LOG();
 
     Pool() {
+
+    }
+
+    public void preparePool(){
         for (int i = 0; i < 10; i++) {
             pool.put(i, createMap_string());
         }
@@ -65,9 +68,9 @@ class Pool {
         return map_string;
     }
 
+
     public void prepare_ships() {
-        String funcName = new Object() {
-        }.getClass().getEnclosingMethod().getName();
+
         HashMap<Integer, Integer> dict_ships = new HashMap<>();
         dict_ships.put(1, 4);
         dict_ships.put(2, 3);
@@ -78,17 +81,14 @@ class Pool {
                 this.createShip(ship.getValue());
             }
         }
-
     }
 
 
     private void createShip(int ship_size) {
-        String funcName = new Object() {
-        }.getClass().getEnclosingMethod().getName();
 
         Random random = new Random();
         HashMap<Integer, List<Integer>> cells;
-        boolean isHorizontal = true;
+        boolean isHorizontal = random.nextBoolean();
         if (isHorizontal) {
             cells = checkCellH(ship_size);
             Ship a = new Ship(cells, this, ship_size);
@@ -99,14 +99,12 @@ class Pool {
     }
 
     public HashMap<Integer, List<Integer>> checkCellV(int ship_size) {
-        String funcName = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-
-        for (int num = 0; num < 10; num++) {
+        Random r = new Random();
+        for (int num = r.nextInt(0, 9); num < 10; num++) {
             HashMap<Integer, List<Integer>> ships_cells = new HashMap<>();
             List<Integer> map_string = new ArrayList<>();
 
-            for (int abc = 0; abc < 10 - ship_size; abc++) {
+            for (int abc = r.nextInt(0, 9); abc < 10 - ship_size; abc++) {
                 for (int len = 0; len < ship_size; len++) {
                     if (BoolORShip(pool.get(abc + len).get(num))) {
                         ships_cells.put(abc + len, Collections.singletonList(num));
@@ -123,38 +121,36 @@ class Pool {
 
     public HashMap<Integer, List<Integer>> checkCellH(int ship_size) {
         HashMap<Integer, List<Integer>> cells = new HashMap<>();
+        Random r = new Random();
 
-        for (int abc = 0; abc < 10; abc++) {
-            List<Integer> map_string = new ArrayList<>(); // Создаем новый список для строки
+        for (int abc = r.nextInt(1, 7); abc < 10; abc++) {
+            List<Integer> map_string = new ArrayList<>();
 
             for (int num = 0; num <= 10 - ship_size; num++) {
                 boolean isValid = true;
 
-                // Проверяем, что все ячейки свободны
+
                 for (int len = 0; len < ship_size; len++) {
                     int snum = num + len;
                     if (!BoolORShip(pool.get(abc).get(snum))) {
                         isValid = false;
-                        break; // Прерываем цикл, если найдено препятствие
+                        break;
                     }
                 }
 
-                // Если все ячейки валидны, добавляем их в map_string
+
                 if (isValid) {
                     for (int len = 0; len < ship_size; len++) {
                         map_string.add(num + len);
                     }
-                    cells.put(abc, new ArrayList<>(map_string)); // Добавляем копию списка
-                    System.out.println(cells);
-                    return cells; // Возвращаем координаты
+                    cells.put(abc, new ArrayList<>(map_string));
+                    return cells;
                 }
-
-                // Сбрасываем map_string для новой попытки
                 map_string.clear();
             }
         }
 
-        return checkCellV(ship_size); // Если не удалось, переключаемся на вертикальную проверку
+        return checkCellV(ship_size);
     }
 
 
@@ -212,9 +208,8 @@ class Ship {
         List<Integer> mKeys = bDist(keys);
         List<Integer> mValues = bDist(values);
 
-        for (int k = mKeys.getFirst(); k <= mKeys.getLast(); k++){
-            for (int v = mValues.getFirst(); v <= mValues.getLast(); v++){
-                System.out.println(k + "false" + v);
+        for (int k = mKeys.getFirst(); k <= mKeys.getLast(); k++) {
+            for (int v = mValues.getFirst(); v <= mValues.getLast(); v++) {
                 pool.pool.get(k).put(v, false);
             }
         }
@@ -228,12 +223,15 @@ class Ship {
 
         if (0 < mn) {
             radius.add(mn - 1);
-        } else { radius.add(mn); }
+        } else {
+            radius.add(mn);
+        }
 
         if (mx < 9) {
             radius.add(mx + 1);
-            System.out.println(true);
-        } else { radius.add(mx); }
+        } else {
+            radius.add(mx);
+        }
 
         return radius;
     }

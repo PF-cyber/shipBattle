@@ -36,10 +36,11 @@ class Player {
     public void shoot(Integer x, Integer y, Player player) {
         if ((x == null) || (y == null)) {
             Scanner sc = new Scanner(System.in);
-            x = Integer.parseInt(sc.next());
-            y = Integer.parseInt(sc.next());
+            x = Integer.parseInt(sc.next())-1;
+            y = Integer.parseInt(sc.next())-1;
             sc.close();
         }
+
     }
 }
 
@@ -47,8 +48,6 @@ class Player {
 class Pool {
     HashMap<Integer, HashMap<Integer, Object>> pool = new HashMap<>();
     List<Ship> ships = new ArrayList<>();
-    LOG log = new LOG();
-
     Pool() {
 
     }

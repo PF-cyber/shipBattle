@@ -1,7 +1,6 @@
-import java.awt.*;
+import java.net.InterfaceAddress;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class SDCTD {
@@ -26,6 +25,7 @@ class Player {
     Pool pool;
     Pool E_pool;
     String name = "Player1";
+    int score = 0;
 
     Player() {
         pool = new Pool();
@@ -33,14 +33,17 @@ class Player {
         E_pool = new Pool();
     }
 
-    public void shoot(Integer x, Integer y, Player player) {
-        if ((x == null) || (y == null)) {
-            Scanner sc = new Scanner(System.in);
-            x = Integer.parseInt(sc.next())-1;
-            y = Integer.parseInt(sc.next())-1;
-            sc.close();
-        }
+    public int shoot(Integer x, Integer y) {
+        Object obj = this.pool.pool.get(x).get(y);
 
+        if (obj instanceof Ship){
+            return ((Ship) obj).getDamage();
+
+        } else if (obj instanceof Boolean){
+            System.out.println("Miss!");
+            return 0;
+        }
+        return 0;
     }
 }
 
@@ -49,17 +52,16 @@ class Pool {
     HashMap<Integer, HashMap<Integer, Object>> pool = new HashMap<>();
     List<Ship> ships = new ArrayList<>();
     Pool() {
-
     }
 
     public void preparePool(){
         for (int i = 0; i < 10; i++) {
-            pool.put(i, createMap_string());
+            pool.put(i, createMapString());
         }
-        prepare_ships();
+        prepareShips();
     }
 
-    private HashMap<Integer, Object> createMap_string() {
+    private HashMap<Integer, Object> createMapString() {
         HashMap<Integer, Object> map_string = new HashMap<>();
         for (int i = 0; i < 10; i++) {
             map_string.put(i, true);
@@ -68,7 +70,7 @@ class Pool {
     }
 
 
-    public void prepare_ships() {
+    public void prepareShips() {
 
         HashMap<Integer, Integer> dict_ships = new HashMap<>();
         dict_ships.put(1, 4);
@@ -154,7 +156,7 @@ class Pool {
 
 
     public boolean BoolORShip(Object value) {
-        if (value instanceof boolean) {
+        if (value instanceof Boolean) {
             return (boolean) value;
         }
         if (value instanceof Ship) {
@@ -167,11 +169,13 @@ class Pool {
 
 class Ship {
     Integer live;
+    Integer ship_size;
     HashMap<Integer, List<Integer>> location = new HashMap<>();
 
     public Ship(HashMap<Integer, List<Integer>> cells, Pool pool, Integer ship_size) {
         this.location = cells;
         this.live = ship_size;
+        this.ship_size = ship_size;
         createShip(pool);
     }
 
@@ -188,14 +192,17 @@ class Ship {
     }
 
 
-    public void getDamage(Integer x, Integer y, Player player) {
+    public int getDamage() {
         this.live -= 1;
-        player.pool.pool.get(x).put(y, true);
+//        player.pool.pool.get(x).put(y, true);
 
         if (this.live == 0) {
             System.out.println("Sunk!");
+            System.out.println("location:" + this.location);
+            return 2;
         } else {
             System.out.println("Got it!");
+            return 1;
         }
     }
 

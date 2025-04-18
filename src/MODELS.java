@@ -11,7 +11,6 @@ public class MODELS {
 abstract class APlayer {
     String name;
     Pool pool;
-    List<Ship> ships;
 
     APlayer() {
         pool = new Pool();
@@ -35,7 +34,6 @@ class Player extends APlayer {
 }
 
 class Bot extends APlayer {
-
 }
 
 class Pool {
@@ -177,6 +175,7 @@ class Ship {
             createShip(size, cells, pool.pool);
             addList(pool);
         }
+        this.location = cells;
         this.hp = size;
         this.size = size;
     }

@@ -4,9 +4,8 @@ import java.util.*;
 import java.util.List;
 
 public class JBOX {
-    public static void main(String[] args) {
-        JUDGE Judge = new JUDGE();
-        new MainFrame(Judge.player, Judge.bot);
+    JBOX(Player player, Bot bot) {
+        new MainFrame(player, bot);
     }
 }
 
@@ -20,7 +19,11 @@ class MainFrame {
 
         mainFrame.setLayout(new BorderLayout());
         mainFrame.add(new PoolFrame(player), BorderLayout.WEST);
-        mainFrame.add(new PoolFrame(bot), BorderLayout.EAST);
+
+        PoolFrame BotFrame = new PoolFrame(player);
+        BotFrame.setterButtons(player);
+        mainFrame.add(BotFrame, BorderLayout.EAST);
+
 
         mainFrame.setTitle("BattleshipGame");
         mainFrame.setSize(1200, 700);
@@ -42,6 +45,7 @@ class MainFrame {
                 for (int j = 0; j < 10; j++) {
                     buttons[i][j] = new JButton();
                     buttons[i][j].setPreferredSize(new Dimension(40, 40));
+                    buttons[i][j].setEnabled(false);
                     poolPanel.add(buttons[i][j]);
                 }
             }
@@ -51,15 +55,11 @@ class MainFrame {
         }
 
         private void setShips(APlayer player) {
-            System.out.println(player.name);
             for (Ship ship : player.pool.ships) {
-                System.out.println("New ship");
                 for (Map.Entry<Integer, List<Integer>> entry : ship.location.entrySet()) {
                     int x = entry.getKey();
-                    System.out.println("Entry: " + entry);
                     for (Integer y : entry.getValue()) {
                         buttons[x][y].setBackground(Color.BLUE);
-                        System.out.println("Cell: " + x + " " + y);
                     }
                 }
             }
@@ -71,6 +71,31 @@ class MainFrame {
                     if (player.pool.pool.get(x).get(y) instanceof Ship) {
                         buttons[x][y].setBackground(Color.BLUE);
                     }
+                }
+            }
+        }
+
+        public void setterButtons(APlayer player) {
+            for (int x = 0; x < 10; x++) {
+                for (int y = 0; y < 10; y++) {
+                    int finalX = x;
+                    int finalY = y;
+                    buttons[x][y].setEnabled(true);
+                    buttons[x][y].addActionListener(e -> {
+                        int result = player.shoot(finalX, finalY);
+                        if (result == 2){
+                            buttons[finalX][finalY].setBackground(Color.RED);
+                        }
+                        buttons[finalX][finalY].setEnabled(false);
+                    });
+                }
+            }
+        }
+
+        public void statusButtons(APlayer player, boolean on){
+            for(JButton[] button_mes : buttons){
+                for(JButton button : button_mes){
+                    button.setEnabled(on);
                 }
             }
         }

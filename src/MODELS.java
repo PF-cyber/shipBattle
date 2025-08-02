@@ -1,11 +1,9 @@
-import org.w3c.dom.ls.LSInput;
-
-import java.awt.*;
-import java.net.InterfaceAddress;
 import java.util.*;
 import java.util.List;
 
 public class MODELS {
+    Player player = new Player();
+    Bot bot = new Bot();
 }
 
 abstract class APlayer {
@@ -16,24 +14,33 @@ abstract class APlayer {
         pool = new Pool();
     }
 
-    public void shoot(int x, int y) {
-        Object cell = (Ship) this.pool.pool.get(x).get(y);
+    public Integer shoot(int x, int y) {
+        Object cell = this.pool.pool.get(x).get(y);
 
         if (cell instanceof Ship) {
             ((Ship) cell).getDamage();
-        } else if (!(Boolean) this.pool.pool.get(x).get(y)) {
+            return 2;
+        } else if ((Boolean) this.pool.pool.get(x).get(y)) {
             this.pool.pool.get(x).put(y, false);
             System.out.println("Miss");
+            return 1;
         } else {
-            System.out.println("Agan?");
+            System.out.println("Again?");
+            return 0;
         }
     }
 }
 
 class Player extends APlayer {
+    Player(){
+        this.name = "player_1";
+    }
 }
 
 class Bot extends APlayer {
+    Bot(){
+        this.name = "bot_1";
+    }
 }
 
 class Pool {

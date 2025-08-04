@@ -17,13 +17,15 @@ class MainFrame {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setResizable(false);
 
+        player.poolFrame = new PoolFrame(player);
+        bot.poolFrame = new PoolFrame(bot);
+
         mainFrame.setLayout(new BorderLayout());
-        mainFrame.add(new PoolFrame(player), BorderLayout.WEST);
 
-        PoolFrame BotFrame = new PoolFrame(player);
-        BotFrame.setterButtons(player);
-        mainFrame.add(BotFrame, BorderLayout.EAST);
+        mainFrame.add(player.poolFrame, BorderLayout.WEST);
+        mainFrame.add(bot.poolFrame, BorderLayout.EAST);
 
+        bot.poolFrame.setterButtons(bot);
 
         mainFrame.setTitle("BattleshipGame");
         mainFrame.setSize(1200, 700);

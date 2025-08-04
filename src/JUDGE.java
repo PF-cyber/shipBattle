@@ -22,13 +22,15 @@ public class JUDGE {
 
     public void shoot(int x, int y){
         int result = queue.getFirst().shoot(x, y);
-        if (result == 0){
+        if (result != 2){
             nextQueue();
+            System.out.println(this.queue);
         }
     }
 
     private void nextQueue() {
         this.queue = queue.reversed();
+
     }
 
     public void blockTurn(APlayer player){

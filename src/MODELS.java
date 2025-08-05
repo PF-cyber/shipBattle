@@ -5,25 +5,31 @@ import java.util.List;
 public class MODELS {
     Player player = new Player();
     Bot bot = new Bot();
+
+    MODELS(){
+        player.enemy = bot;
+        bot.enemy = player;
+    }
 }
 
 abstract class APlayer {
     String name;
     Pool pool;
     MainFrame.PoolFrame poolFrame;
+    APlayer enemy;
     APlayer() {
         pool = new Pool();
     }
 
     public Integer shoot(int x, int y) {
-        Object cell = this.pool.pool.get(x).get(y);
-        System.out.println(MessageFormat.format("{0} shoot x:{1} y:{2}",this.name, x, y));
+        Object cell = this.enemy.pool.pool.get(x).get(y);
+        System.out.println(MessageFormat.format("{0} shoot x:{1} y:{2}", this.name, x, y));
         if (cell instanceof Ship) {
             ((Ship) cell).getDamage();
             System.out.println("Result: "+2);
             return 2;
-        } else if ((Boolean) this.pool.pool.get(x).get(y)) {
-            this.pool.pool.get(x).put(y, false);
+        } else if ((Boolean) this.enemy.pool.pool.get(x).get(y)) {
+            this.enemy.pool.pool.get(x).put(y, false);
             System.out.println("Miss");
             return 1;
         } else {

@@ -25,7 +25,7 @@ class MainFrame {
         mainFrame.add(player.poolFrame, BorderLayout.WEST);
         mainFrame.add(bot.poolFrame, BorderLayout.EAST);
 
-        bot.poolFrame.setterButtons(bot);
+        bot.poolFrame.setterButtons(bot.enemy);
 
         mainFrame.setTitle("BattleshipGame");
         mainFrame.setSize(1200, 700);
@@ -94,7 +94,7 @@ class MainFrame {
             }
         }
 
-        public void statusButtons(APlayer player, boolean on){
+        public void statusButtons(boolean on){
             for(JButton[] button_mes : buttons){
                 for(JButton button : button_mes){
                     button.setEnabled(on);

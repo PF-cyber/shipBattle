@@ -5,8 +5,8 @@ public class GAME {
         Player player = models.player;
         Bot bot = models.bot;
 
-        JUDGE judge = new JUDGE(player, bot);
         JBOX jbox = new JBOX(player, bot);
+        JUDGE judge = new JUDGE(player, bot);
 
 
     }

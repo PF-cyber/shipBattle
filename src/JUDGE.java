@@ -6,11 +6,12 @@ public class JUDGE {
     List<APlayer> queue = new ArrayList<>();
     boolean AleaJacta;
 
+
     JUDGE(Player player, Bot bot) {
         AleaJactaEst(player, bot);
     }
 
-    public void AleaJactaEst(Player player, Bot bot) {
+    public void AleaJactaEst(APlayer player, Bot bot) {
         queue.add(player);
         queue.add(bot);
         AleaJacta = new Random().nextBoolean();
@@ -18,6 +19,8 @@ public class JUDGE {
             queue = queue.reversed();
         }
         System.out.println("First turn: " + queue.getFirst().name);
+        System.out.println(queue);
+        queue.getFirst().poolFrame.statusButtons(false);
     }
 
     public void shoot(int x, int y){

@@ -4,10 +4,9 @@ public class GAME {
         MODELS models = new MODELS();
         Player player = models.player;
         Bot bot = models.bot;
+        JUDGE judge = new JUDGE();
+        JBOX jbox = new JBOX(player, bot, judge);
 
-        JBOX jbox = new JBOX(player, bot);
-        JUDGE judge = new JUDGE(player, bot);
-
-
+        judge.AleaJactaEst(player, bot);
     }
 }

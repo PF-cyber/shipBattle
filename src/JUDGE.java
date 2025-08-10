@@ -6,11 +6,6 @@ public class JUDGE {
     List<APlayer> queue = new ArrayList<>();
     boolean AleaJacta;
 
-
-    JUDGE(Player player, Bot bot) {
-        AleaJactaEst(player, bot);
-    }
-
     public void AleaJactaEst(APlayer player, Bot bot) {
         queue.add(player);
         queue.add(bot);
@@ -23,20 +18,20 @@ public class JUDGE {
         queue.getFirst().poolFrame.statusButtons(false);
     }
 
-    public void shoot(int x, int y){
-        int result = queue.getFirst().shoot(x, y);
-        if (result != 2){
+    public void shoot_evaluetion(int result){
+        if (result == 1){
             nextQueue();
-            System.out.println(this.queue);
+            System.out.println("Change queue: " + queue.getFirst().name + " " + queue.getLast().name);
         }
     }
 
     private void nextQueue() {
         this.queue = queue.reversed();
-
+        blockTurn();
     }
 
-    public void blockTurn(APlayer player){
-
+    public void blockTurn(){
+        this.queue.getFirst().poolFrame.statusButtons(false);
+        this.queue.getLast().poolFrame.statusButtons(true);
     }
 }

@@ -4,28 +4,35 @@ import java.util.*;
 import java.util.List;
 
 public class JBOX {
-    JBOX(Player player, Bot bot) {
-        new MainFrame(player, bot);
+    JUDGE judge;
+    MainFrame.PoolFrame ppFrame;
+    MainFrame.PoolFrame bpFrame;
+
+    JBOX(Player player, Bot bot, JUDGE judge) {
+        new MainFrame(player, bot, judge);
     }
 }
 
 class MainFrame {
     JFrame mainFrame = new JFrame();
+    PoolFrame ppFrame;
+    PoolFrame bpFrame;
 
-    MainFrame(Player player, Bot bot) {
+    MainFrame(Player player, Bot bot, JUDGE judge) {
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setResizable(false);
 
-        player.poolFrame = new PoolFrame(player);
-        bot.poolFrame = new PoolFrame(bot);
+        this.ppFrame = new PoolFrame(player, judge);
+        player.poolFrame = ppFrame;
+        this.bpFrame = new PoolFrame(bot, judge);
+        bot.poolFrame = bpFrame;
 
         mainFrame.setLayout(new BorderLayout());
+        mainFrame.add(this.ppFrame, BorderLayout.WEST);
+        mainFrame.add(this.bpFrame, BorderLayout.EAST);
 
-        mainFrame.add(player.poolFrame, BorderLayout.WEST);
-        mainFrame.add(bot.poolFrame, BorderLayout.EAST);
-
-        bot.poolFrame.setterButtons(bot.enemy);
+        bpFrame.setterButtons(bot.enemy, judge);
 
         mainFrame.setTitle("BattleshipGame");
         mainFrame.setSize(1200, 700);
@@ -37,7 +44,7 @@ class MainFrame {
         private final JButton[][] buttons;
         boolean EnButtons = true;
 
-        PoolFrame(APlayer player) {
+        PoolFrame(APlayer player, JUDGE judge) {
             poolPanel.setLayout(new GridLayout(10, 10));
             poolPanel.setBackground(Color.GRAY);
 
@@ -77,7 +84,7 @@ class MainFrame {
             }
         }
 
-        public void setterButtons(APlayer player) {
+        public void setterButtons(APlayer player, JUDGE judge) {
             for (int x = 0; x < 10; x++) {
                 for (int y = 0; y < 10; y++) {
                     int finalX = x;
@@ -88,6 +95,7 @@ class MainFrame {
                         if (result == 2){
                             buttons[finalX][finalY].setBackground(Color.RED);
                         }
+                        judge.shoot_evaluetion(result);
                         buttons[finalX][finalY].setEnabled(false);
                     });
                 }

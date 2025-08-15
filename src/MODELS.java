@@ -26,7 +26,9 @@ abstract class APlayer {
         Object cell = this.enemy.pool.pool.get(x).get(y);
         System.out.println(MessageFormat.format("{0} shoot x:{1} y:{2}", this.name, x, y));
         if (cell instanceof Ship) {
-            return ((Ship) cell).getDamage();
+            ((Ship) cell).getDamage();
+            System.out.println("Result: " + 2);
+            return 2;
         } else if ((Boolean) this.enemy.pool.pool.get(x).get(y)) {
             this.enemy.pool.pool.get(x).put(y, false);
             System.out.println("Miss");
@@ -45,98 +47,107 @@ class Player extends APlayer {
 }
 
 class Bot extends APlayer {
-    int st;
-
-    HashMap<Integer, List<Integer>> target_map;
+    private HUNTER hunter = new HUNTER();
 
     Bot() {
         this.name = "bot_1";
     }
 
+    public Integer makeMove() {
+        List<Integer> target = hunter.getNextTarget();
+        int x = target.get(0);
+        int y = target.get(1);
+        int result = shoot(x, y);
+        hunter.updateTargetMap(x, y, result);
+        return result;
+    }
+
     class HUNTER {
-        HashMap<Integer, Integer> last_target;
-        int st = 0;
-        HashMap<String, Integer> o = new HashMap<>(Map.of("h", 0, "v", 0));
-        ArrayList<Integer> last_cell;
-        ArrayList<Integer> target_cell;
-        HashMap<Integer, List<Integer>> target_map = new HashMap<>();
-        int last_shoot_result;
+        private int huntingMode = 1; // 1 - random, 2 - hunting, 3 - pursuit
+        private List<Integer> lastHit = new ArrayList<>();
+        private List<List<Integer>> possibleTargets = new ArrayList<>();
+        private int lastShotResult = 0; // 0 - none, 1 - miss, 2 - hit, 3 - sunk
 
-        private void create_target_map() {
-            for (int x = 0; x < 10; x++) {
-                target_map.put(x, new ArrayList<>());
-                for (int y = 0; y < 10; y++) {
-                    target_map.get(x).add(y);
+
+        public void updateTargetMap(int x, int y, int result) {
+            lastShotResult = result;
+
+            if (result == 2) {
+                if (huntingMode == 1) {
+                    huntingMode = 2;
+                    lastHit = Arrays.asList(x, y);
+                    generatePossibleTargets(x, y);
+                } else if (huntingMode == 2 || huntingMode == 3) {
+                    huntingMode = 3;
+                    lastHit = Arrays.asList(x, y);
+                    filterPossibleTargets(x, y);
+                }
+            } else if (result == 1) {
+                if (huntingMode == 3) {
+                    huntingMode = 2;
+                }
+            } else if (result == 3) {
+                huntingMode = 1;
+                lastHit.clear();
+                possibleTargets.clear();
+            }
+        }
+
+
+        private void generatePossibleTargets(int x, int y) {
+            possibleTargets.clear();
+            int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+            for (int[] dir : directions) {
+                int newX = x + dir[0];
+                int newY = y + dir[1];
+
+                if (newX >= 0 && newX < 10 && newY >= 0 && newY < 10) {
+                    possibleTargets.add(Arrays.asList(newX, newY));
                 }
             }
-            System.out.println("HUNTER: target_map created");
         }
 
-        private void search_cell() {
-            if (st == 0) {
-                int x = new Random()
-                int y = new Random().nextInt(10);
 
-                last_cell = new ArrayList<>(List.of(x, y));
-                target_cell = new ArrayList<>(List.of(x, y));
-            }
-        }
+        private void filterPossibleTargets(int x, int y) {
+            if (possibleTargets.isEmpty()) return;
 
-        private void starct_target(int shoot_result) {
-            int x;
-            int y;
-            if (st == 2 & shoot_result == 2) { //if target and hit
+            int prevX = lastHit.get(0);
+            int prevY = lastHit.get(1);
 
-                last_cell = new ArrayList<>(List.of(x, y));
-                target_cell = new ArrayList<>(List.of(x, y));
-            }  else if(st == 2 & shoot_result == 1){ //if target and not hit
 
-            }
-        }
+            int dx = x - prevX;
+            int dy = y - prevY;
 
-        private List<Object> geto(){
-            for(Map.Entry<String, Integer> entry : o.entrySet()){
-                if (entry.getValue() != 0){
-                    return new ArrayList<>(List.of(entry.getKey(), entry.getValue()));
+            List<List<Integer>> newTargets = new ArrayList<>();
+            for (List<Integer> target : possibleTargets) {
+                int tx = target.get(0);
+                int ty = target.get(1);
+
+
+                if ((dx != 0 && tx - x == dx) || (dy != 0 && ty - y == dy)) {
+                    newTargets.add(Arrays.asList(tx, ty));
                 }
             }
-            return null;
+            possibleTargets = newTargets;
         }
 
-        private List<Integer> delta_cord(int x, int y){
-            List<Object> d_o = geto();
-            int dx = 0;
-            int dy = 0;
-            if(d_o.getFirst() == "h"){
-               dy = y + (int)d_o.getLast();
-               if (outrange(dy)){
-                   dy = y;
-               }
-            } else if (d_o.getFirst() == "v"){
-                dx = x + (int)d_o.getLast();
-                if (outrange(dx)){
-                    dx = x;
+
+        public List<Integer> getNextTarget() {
+            if (huntingMode == 1) {
+                Random rand = new Random();
+                int x = rand.nextInt(10);
+                int y = rand.nextInt(10);
+                return Arrays.asList(x, y);
+            } else if (huntingMode == 2 || huntingMode == 3) {
+                if (!possibleTargets.isEmpty()) {
+                    return possibleTargets.remove(0);
+                } else {
+                    huntingMode = 1;
+                    return getNextTarget();
                 }
             }
-            return new ArrayList<>(List.of(dx, dy));
-        }
-
-        private HashMap<Integer, Integer> getRandom(){
-            Random r = new Random();
-            List<Map.Entry<Integer, List<Integer>>> entries = new ArrayList<>(target_map.entrySet());
-            Map.Entry<Integer, List<Integer>> re = entries.get(r.nextInt(entries.size()));
-            int x = re.getKey();
-            int y = re.getValue().get(r.nextInt(re.getValue().size()));
-            System.out.println("Random x:" + x +" y:"+ y);
-
-            return new HashMap<Integer, Integer>(x, y);
-        }
-
-        private boolean outrange(int a){
-            if (a < 0 || a > 10){
-                return true;
-            }
-            return false;
+            return Arrays.asList(0, 0);
         }
     }
 }
@@ -291,14 +302,12 @@ class Ship {
         }
     }
 
-    public Integer getDamage() {
+    public void getDamage() {
         this.hp -= 1;
         if (this.hp == 0) {
             System.out.println("Sunk!");
-            return 3;
         } else {
             System.out.println("Get hit!");
-            return 2;
         }
     }
 

@@ -6,9 +6,7 @@ public class JUDGE {
     List<APlayer> queue = new ArrayList<>();
     boolean AleaJacta;
 
-
     JUDGE(Player player, Bot bot) {
-        AleaJactaEst(player, bot);
     }
 
     public void AleaJactaEst(APlayer player, Bot bot) {
@@ -20,23 +18,44 @@ public class JUDGE {
         }
         System.out.println("First turn: " + queue.getFirst().name);
         System.out.println(queue);
-        queue.getFirst().poolFrame.statusButtons(false);
+        queue.getFirst().poolFrame.statusBlockPanel(false);
+        firstTurn();
     }
 
-    public void shoot(int x, int y){
-        int result = (queue.getFirst().shoot(x, y));
-        if (result != 2){
+    public void shoot(int x, int y) {
+        int result = 0;
+        APlayer assaulter = queue.getFirst();
+
+        if(assaulter instanceof Player){
+            result = assaulter.shoot(x, y);
+        }
+        if (result <= 1) {
             nextQueue();
             System.out.println(this.queue);
+            assaulter = queue.getFirst();
+        }
+        if(assaulter instanceof Bot){
+            do {
+                result = ((Bot) assaulter).makeMove();
+            } while (result > 1);
+            nextQueue();
         }
     }
 
     private void nextQueue() {
+        queue.getFirst().poolFrame.statusBlockPanel(true);
         this.queue = queue.reversed();
-
+        queue.getFirst().poolFrame.statusBlockPanel(false);
     }
 
-    public void blockTurn(APlayer player){
-
+    public void firstTurn() {
+        APlayer assaulter = queue.getFirst();
+        if(assaulter instanceof Bot){
+            int result = 0;
+            do {
+                result = ((Bot) assaulter).makeMove();
+            } while(result > 1);
+        }
+        nextQueue();
     }
 }

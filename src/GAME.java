@@ -4,7 +4,7 @@ public class GAME {
         MODELS models = new MODELS();
         Player player = models.player;
         Bot bot = models.bot;
-        JUDGE judge = new JUDGE();
+        JUDGE judge = new JUDGE(player, bot);
         JBOX jbox = new JBOX(player, bot, judge);
 
         judge.AleaJactaEst(player, bot);

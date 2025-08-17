@@ -26,16 +26,23 @@ abstract class APlayer {
         Object cell = this.enemy.pool.pool.get(x).get(y);
         System.out.println(MessageFormat.format("{0} shoot x:{1} y:{2}", this.name, x, y));
         if (cell instanceof Ship) {
-            ((Ship) cell).getDamage();
-            System.out.println("Result: " + 2);
-            return 2;
+            int result = ((Ship) cell).getDamage();
+            enemy.poolFrame.damageCell(x, y, result);
+            System.out.println("Result: " + result);
+            return result;
+
         } else if ((Boolean) this.enemy.pool.pool.get(x).get(y)) {
+            int result = 1;
             this.enemy.pool.pool.get(x).put(y, false);
+            enemy.poolFrame.damageCell(x, y, result);
             System.out.println("Miss");
-            return 1;
+            return result;
+
         } else {
+            int result = 0;
+            enemy.poolFrame.damageCell(x, y, result);
             System.out.println("Again?");
-            return 0;
+            return result;
         }
     }
 }
@@ -63,46 +70,75 @@ class Bot extends APlayer {
     }
 
     class HUNTER {
-        private int huntingMode = 1; // 1 - random, 2 - hunting, 3 - pursuit
+        private int huntingMode = 1; 
         private List<Integer> lastHit = new ArrayList<>();
         private List<List<Integer>> possibleTargets = new ArrayList<>();
-        private int lastShotResult = 0; // 0 - none, 1 - miss, 2 - hit, 3 - sunk
+        private int lastShotResult = 0; 
+        private HashMap<Integer, List<Integer>> targetMap = new HashMap<>();
 
+        HUNTER(){
+            generateTargetMap();
+        }
 
         public void updateTargetMap(int x, int y, int result) {
             lastShotResult = result;
 
-            if (result == 2) {
-                if (huntingMode == 1) {
-                    huntingMode = 2;
-                    lastHit = Arrays.asList(x, y);
-                    generatePossibleTargets(x, y);
-                } else if (huntingMode == 2 || huntingMode == 3) {
-                    huntingMode = 3;
-                    lastHit = Arrays.asList(x, y);
-                    filterPossibleTargets(x, y);
+            if (result == 2) { 
+                if (huntingMode == 1) { 
+                    huntingMode = 2; 
+                    lastHit = Arrays.asList(x, y); 
+                    generatePossibleTargets(x, y); 
+                } else if (huntingMode == 2 || huntingMode == 3) { 
+                    huntingMode = 3; 
+                    lastHit = Arrays.asList(x, y); 
+                    filterPossibleTargets(x, y); 
                 }
-            } else if (result == 1) {
-                if (huntingMode == 3) {
-                    huntingMode = 2;
+            } else if (result == 1) { 
+                if (huntingMode == 3) { 
+                    huntingMode = 2; 
                 }
-            } else if (result == 3) {
-                huntingMode = 1;
-                lastHit.clear();
-                possibleTargets.clear();
+            } else if (result == 3) { 
+                huntingMode = 1; 
+                lastHit.clear(); 
+                possibleTargets.clear(); 
             }
         }
 
+        private void generateTargetMap(){
+            for (int i = 0; i < 10; i++) {
+                List<Integer> line = new ArrayList<>();
+                for (int j = 0; j < 10; j++) {
+                    line.add(j);
+                }
+                targetMap.put(i, line);
+            }
+        }
+
+        private List<Integer> getRandomXY(){
+            Random r = new Random();
+            List<Map.Entry<Integer, List<Integer>>> entries = new ArrayList<>(targetMap.entrySet());
+            Map.Entry<Integer, List<Integer>> re = entries.get(r.nextInt(entries.size()));
+            int x = re.getKey();
+            int y = re.getValue().get(r.nextInt(re.getValue().size()));
+            return new ArrayList<>(List.of(x, y));
+        }
+
+        private void removeCell(int x, int y){
+            targetMap.get(x).remove(Integer.valueOf(y));
+            if(targetMap.get(x).isEmpty()){
+                targetMap.remove(x);
+            }
+        }
 
         private void generatePossibleTargets(int x, int y) {
-            possibleTargets.clear();
-            int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+            possibleTargets.clear(); 
+            int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; 
 
-            for (int[] dir : directions) {
+            for (int[] dir : directions) { 
                 int newX = x + dir[0];
                 int newY = y + dir[1];
 
-                if (newX >= 0 && newX < 10 && newY >= 0 && newY < 10) {
+                if (newX >= 0 && newX < 10 && newY >= 0 && newY < 10) { 
                     possibleTargets.add(Arrays.asList(newX, newY));
                 }
             }
@@ -110,13 +146,13 @@ class Bot extends APlayer {
 
 
         private void filterPossibleTargets(int x, int y) {
-            if (possibleTargets.isEmpty()) return;
+            if (possibleTargets.isEmpty()) return; 
 
             int prevX = lastHit.get(0);
             int prevY = lastHit.get(1);
 
 
-            int dx = x - prevX;
+            int dx = x - prevX; 
             int dy = y - prevY;
 
             List<List<Integer>> newTargets = new ArrayList<>();
@@ -125,26 +161,28 @@ class Bot extends APlayer {
                 int ty = target.get(1);
 
 
-                if ((dx != 0 && tx - x == dx) || (dy != 0 && ty - y == dy)) {
-                    newTargets.add(Arrays.asList(tx, ty));
+                if ((dx != 0 && tx - x == dx) || (dy != 0 && ty - y == dy)) { 
+                    newTargets.add(Arrays.asList(tx, ty)); 
                 }
             }
-            possibleTargets = newTargets;
+            possibleTargets = newTargets; 
         }
 
 
         public List<Integer> getNextTarget() {
-            if (huntingMode == 1) {
-                Random rand = new Random();
-                int x = rand.nextInt(10);
-                int y = rand.nextInt(10);
-                return Arrays.asList(x, y);
-            } else if (huntingMode == 2 || huntingMode == 3) {
-                if (!possibleTargets.isEmpty()) {
-                    return possibleTargets.remove(0);
-                } else {
+            if (huntingMode == 1) { 
+                System.out.println(name + " get random xy");
+                List<Integer> grxy = getRandomXY(); 
+                int x = grxy.getFirst();
+                int y = grxy.getLast();
+                removeCell(x, y); 
+                return Arrays.asList(x, y); 
+            } else if (huntingMode == 2 || huntingMode == 3) { 
+                if (!possibleTargets.isEmpty()) { 
+                    return possibleTargets.remove(0); 
+                } else { 
                     huntingMode = 1;
-                    return getNextTarget();
+                    return getNextTarget(); 
                 }
             }
             return Arrays.asList(0, 0);
@@ -302,12 +340,14 @@ class Ship {
         }
     }
 
-    public void getDamage() {
+    public int getDamage() {
         this.hp -= 1;
         if (this.hp == 0) {
             System.out.println("Sunk!");
+            return 3;
         } else {
             System.out.println("Get hit!");
+            return 2;
         }
     }
 

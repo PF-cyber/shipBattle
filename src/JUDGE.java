@@ -37,7 +37,7 @@ public class JUDGE {
         if(assaulter instanceof Bot){
             do {
                 result = ((Bot) assaulter).makeMove();
-            } while (result > 1);
+            } while (result > 1 );
             nextQueue();
         }
     }
@@ -55,7 +55,15 @@ public class JUDGE {
             do {
                 result = ((Bot) assaulter).makeMove();
             } while(result > 1);
+            nextQueue();
         }
-        nextQueue();
+    }
+
+    private void whoWin(){
+        if(queue.getFirst().pool.ships.isEmpty()){
+            System.out.println(queue.getLast().name + " is winner!");
+        } else if(queue.getLast().pool.ships.isEmpty()){
+            System.out.println(queue.getLast().name + " is winner!");
+        }
     }
 }

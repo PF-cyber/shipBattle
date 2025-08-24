@@ -26,20 +26,28 @@ public class JUDGE {
         int result = 0;
         APlayer assaulter = queue.getFirst();
 
-        if(assaulter instanceof Player){
+        if (assaulter instanceof Bot) {
+            queue.getLast().poolFrame.statusBlockPanel(true);
+        }
+
+        if (assaulter instanceof Player) {
             result = assaulter.shoot(x, y);
         }
+
         if (result <= 1) {
             nextQueue();
             System.out.println(this.queue);
             assaulter = queue.getFirst();
         }
-        if(assaulter instanceof Bot){
+
+        if (assaulter instanceof Bot) {
             do {
                 result = ((Bot) assaulter).makeMove();
-            } while (result > 1 );
+                if (whoWin()) return;
+            } while (result > 1);
             nextQueue();
         }
+        if (whoWin()) return;
     }
 
     private void nextQueue() {
@@ -50,20 +58,23 @@ public class JUDGE {
 
     public void firstTurn() {
         APlayer assaulter = queue.getFirst();
-        if(assaulter instanceof Bot){
+        if (assaulter instanceof Bot) {
             int result = 0;
             do {
                 result = ((Bot) assaulter).makeMove();
-            } while(result > 1);
+            } while (result > 1);
             nextQueue();
         }
     }
 
-    private void whoWin(){
-        if(queue.getFirst().pool.ships.isEmpty()){
+    private boolean whoWin() {
+        if (queue.getFirst().pool.ships.isEmpty()) {
             System.out.println(queue.getLast().name + " is winner!");
-        } else if(queue.getLast().pool.ships.isEmpty()){
-            System.out.println(queue.getLast().name + " is winner!");
+            return true;
+        } else if (queue.getLast().pool.ships.isEmpty()) {
+            System.out.println(queue.getFirst().name + " is winner!");
+            return true;
         }
+        return false;
     }
 }

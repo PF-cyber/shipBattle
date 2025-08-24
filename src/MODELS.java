@@ -18,6 +18,7 @@ abstract class APlayer {
     APlayer enemy;
 
     APlayer() {
+        info();
         pool = new Pool();
     }
 
@@ -25,7 +26,7 @@ abstract class APlayer {
         Object cell = this.enemy.pool.pool.get(x).get(y);
         System.out.println(MessageFormat.format("{0} shoot x:{1} y:{2}", this.name, x, y));
         if (cell instanceof Ship) {
-            int result = ((Ship) cell).getDamage(pool);
+            int result = ((Ship) cell).getDamage(enemy.pool);
             enemy.poolFrame.damageCell(x, y, result);
             System.out.println("Result: " + result);
             return result;
@@ -43,6 +44,12 @@ abstract class APlayer {
             System.out.println("Again?");
             return result;
         }
+    }
+
+    public void info(){
+        System.out.println("INFO:");
+        System.out.println("\tAPlayer object: "+this +  " " +
+                         "Name: " + name + " ");
     }
 }
 
@@ -257,6 +264,8 @@ class Pool {
     Pool() {
         createPool();
         createShips();
+        info();
+
         this.visualPool();
     }
 
@@ -375,6 +384,22 @@ class Pool {
             }
         }
     }
+
+    public void info(){
+        HashMap<Integer, Integer> len_ships = new HashMap<>();
+        System.out.println("INFO: ");
+        System.out.println("\tPool object: " + this);
+        for(Ship ship : ships){
+            System.out.println(ship);
+            int size = ship.size;
+            if (!len_ships.containsKey(size)) len_ships.put(size, 0);
+            len_ships.put(size, len_ships.get(size) + 1);
+        }
+        System.out.println("\tShips: ");
+        for (Map.Entry<Integer, Integer> entry : len_ships.entrySet()){
+            System.out.println("\t\t" + "size:" + entry.getKey() + " count:" + entry.getValue());
+        }
+    }
 }
 
 class Ship {
@@ -400,9 +425,11 @@ class Ship {
 
     public int getDamage(Pool pool) {
         this.hp -= 1;
+        info(pool);
+        pool.info();
         if (this.hp == 0) {
             System.out.println("Sunk!");
-            pool.ships.remove(this);
+            System.out.println(pool.ships.remove(this));
             return 3;
         } else {
             System.out.println("Get hit!");
@@ -447,5 +474,14 @@ class Ship {
             }
         }
         return true;
+    }
+
+    private void info(Pool pool){
+        System.out.println("INFO(Ship):");
+        System.out.print("Ship object: " + this);
+        System.out.print(" \tSize:" + size);
+        System.out.print(" HP:" + hp);
+        System.out.print(" \tLocation:" + pool + " " + location);
+
     }
 }

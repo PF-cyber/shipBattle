@@ -87,19 +87,6 @@ class MainFrame {
 
             this.add(poolPanel, JLayeredPane.DEFAULT_LAYER);
             this.add(blockPanel, JLayeredPane.PALETTE_LAYER);
-            setShips(player);
-            visualShips(player);
-        }
-
-        private void setShips(APlayer player) {
-            for (Ship ship : player.pool.ships) {
-                for (Map.Entry<Integer, List<Integer>> entry : ship.location.entrySet()) {
-                    int x = entry.getKey();
-                    for (Integer y : entry.getValue()) {
-                        buttons[x][y].setBackground(Color.BLUE);
-                    }
-                }
-            }
         }
 
         public void visualShips(APlayer player) {

@@ -4,6 +4,7 @@ import java.util.Random;
 
 public class JUDGE {
     List<APlayer> queue = new ArrayList<>();
+    MainFrame mainFrame;
     boolean AleaJacta;
 
     JUDGE(Player player, Bot bot) {
@@ -70,9 +71,11 @@ public class JUDGE {
     private boolean whoWin() {
         if (queue.getFirst().pool.ships.isEmpty()) {
             System.out.println(queue.getLast().name + " is winner!");
+            mainFrame.showVictory(queue.getLast().name);
             return true;
         } else if (queue.getLast().pool.ships.isEmpty()) {
             System.out.println(queue.getFirst().name + " is winner!");
+            mainFrame.showVictory(queue.getFirst().name);
             return true;
         }
         return false;

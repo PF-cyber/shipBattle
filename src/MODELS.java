@@ -46,10 +46,10 @@ abstract class APlayer {
         }
     }
 
-    public void info(){
+    public void info() {
         System.out.println("INFO:");
-        System.out.println("\tAPlayer object: "+this +  " " +
-                         "Name: " + name + " ");
+        System.out.println("\tAPlayer object: " + this + " " +
+                "Name: " + name + " ");
     }
 }
 
@@ -385,18 +385,18 @@ class Pool {
         }
     }
 
-    public void info(){
+    public void info() {
         HashMap<Integer, Integer> len_ships = new HashMap<>();
         System.out.println("INFO: ");
         System.out.println("\tPool object: " + this);
-        for(Ship ship : ships){
+        for (Ship ship : ships) {
             System.out.println(ship);
             int size = ship.size;
             if (!len_ships.containsKey(size)) len_ships.put(size, 0);
             len_ships.put(size, len_ships.get(size) + 1);
         }
         System.out.println("\tShips: ");
-        for (Map.Entry<Integer, Integer> entry : len_ships.entrySet()){
+        for (Map.Entry<Integer, Integer> entry : len_ships.entrySet()) {
             System.out.println("\t\t" + "size:" + entry.getKey() + " count:" + entry.getValue());
         }
     }
@@ -476,7 +476,7 @@ class Ship {
         return true;
     }
 
-    private void info(Pool pool){
+    private void info(Pool pool) {
         System.out.println("INFO(Ship):");
         System.out.print("Ship object: " + this);
         System.out.print(" \tSize:" + size);
